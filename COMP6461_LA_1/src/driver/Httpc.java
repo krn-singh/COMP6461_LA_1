@@ -1,6 +1,6 @@
-package client;
+package driver;
 
-public class Client {
+public class Httpc {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

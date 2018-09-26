@@ -13,5 +13,5 @@ public class Instances {
 	private OutputStreamWriter osw;
 	private BufferedReader reader;
 	private BufferedWriter writer;
-	private String path = "";
+	private String path = "/";
 }

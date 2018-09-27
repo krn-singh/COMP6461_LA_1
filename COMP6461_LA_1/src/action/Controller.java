@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.HashMap;
 
 /**
  * Provides the methods that perform the required actions(say, GET, POST) as per the user request.
@@ -15,15 +16,19 @@ import java.net.Socket;
  */
 public class Controller {
 
+	// Stores the request
+	private String request = null;
+	
 	/**
 	 * Simple GET request to fetch data from host.
 	 * 
 	 * @param host Name of the host
 	 * @param port Port Number(By default, HTTP has port number 80)
 	 * @param path Directory within the host
+	 * @param headers Collection of request headers with key-value pair
 	 * @throws IOException 
 	 */
-	public void getRequest(String host, int port, String path) throws IOException {
+	public void getRequest(String host, int port, String path, HashMap<String, String> headers) throws IOException {
 		
 		Socket socket = null;
 		BufferedWriter bufferWriter = null;
@@ -31,11 +36,17 @@ public class Controller {
 		try {	
 			socket = new Socket(host, port);
 			bufferWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+			request = "";
 			
 			// building a GET request
-			bufferWriter.write("GET " +path+" HTTP/1.0\r\n");
-			bufferWriter.write("Host: "+host+"\r\n");
-			bufferWriter.write("\r\n");
+			request += "GET " +path+" HTTP/1.0\r\n";
+			request += "Host: "+host+"\r\n";
+			if (headers != null) {
+				addHeaders(headers);
+			}
+			request += "\r\n";
+			
+			bufferWriter.write(request);
 			bufferWriter.flush();
 			
 			bufferReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -53,6 +64,8 @@ public class Controller {
 				if (!isVerbose) {	System.out.println(response);	}				
 			}			
 		} finally {
+			request = null;
+			headers = null;
 			bufferReader.close();
 			bufferWriter.close();
 			socket.close();
@@ -67,9 +80,10 @@ public class Controller {
 	 * @param host Name of the host
 	 * @param port Port Number(By default, HTTP has port number 80)
 	 * @param path Directory within the host
+	 * @param headers Collection of request headers with key-value pair
 	 * @throws IOException 
 	 */
-	public void getRequestWithVerbose(String host, int port, String path) throws IOException {
+	public void getRequestWithVerbose(String host, int port, String path, HashMap<String, String> headers) throws IOException {
 		
 		Socket socket = null;
 		BufferedWriter bufferWriter = null;
@@ -77,11 +91,17 @@ public class Controller {
 		try {	
 			socket = new Socket(host, port);
 			bufferWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
+			request = "";
 			
 			// building a GET request
-			bufferWriter.write("GET " +path+" HTTP/1.0\r\n");
-			bufferWriter.write("Host: "+host+"\r\n");
-			bufferWriter.write("\r\n");
+			request += "GET " +path+" HTTP/1.0\r\n";
+			request += "Host: "+host+"\r\n";
+			if (headers != null) {
+				addHeaders(headers);
+			}
+			request += "\r\n";
+			
+			bufferWriter.write(request);
 			bufferWriter.flush();
 			
 			bufferReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -94,9 +114,26 @@ public class Controller {
 				System.out.println(response);				
 			}			
 		} finally {
+			request = null;
+			headers = null;
 			bufferReader.close();
 			bufferWriter.close();
 			socket.close();
+		}
+	}
+	
+	/**
+	 * Adds headers to the request message.
+	 * 
+	 * @param headers Collection of request headers with key-value pair
+	 */
+	public void addHeaders(HashMap<String, String> headers) {
+		try {
+			headers.forEach((key,value) -> {
+				request += key+": "+value+"\r\n";
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package driver;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import action.Controller;
 import utils.Constants;
@@ -11,6 +12,7 @@ public class Httpc {
 	private static String host;
 	private static String path;
 	private static String query;
+	private static HashMap<String, String> headers = null;
 	
 	private static void parseURL(String URL) {
 		String str = URL;
@@ -55,11 +57,29 @@ public class Httpc {
 				break;
 		case "get":
 			if(args.length == 3)
-				obj.getRequest(host, Constants.DEFAULT_PORT, path);				//command -> httpc get URL
+				obj.getRequest(host, Constants.DEFAULT_PORT, path, headers);				//command -> httpc get URL
 			else if (args.length == 4)
-				obj.getRequestWithVerbose(host, Constants.DEFAULT_PORT, path);	//command -> httpc get -v URL
+				obj.getRequestWithVerbose(host, Constants.DEFAULT_PORT, path, headers);	//command -> httpc get -v URL
 			else
-				//to-do
+				headers = new HashMap<>();
+				if(args[2].equals("-v")) {	//with verbose
+					int numHeaders = (args.length-4)/2;
+					for(int i=0; i<numHeaders; i++) {
+						int argNumber =  4+i*2;
+						String keyValue[] = args[argNumber].split(":");
+						headers.put(keyValue[0] + "\"", "\"" + keyValue[1]);
+					}
+					obj.getRequestWithVerbose(host, Constants.DEFAULT_PORT, path, headers); //command -> httpc get -v (-h key:value)* URL
+				}
+				else { 	//without verbose
+					int numHeaders = (args.length-3)/2;
+					for(int i=0; i<numHeaders; i++) {
+						int argNumber =  3+i*2;
+						String keyValue[] = args[argNumber].split(":");
+						headers.put(keyValue[0] + "\"", "\"" + keyValue[1]);
+					}
+					obj.getRequest(host, Constants.DEFAULT_PORT, path, headers); //command -> httpc get (-h key:value)* URL
+				}
 			break;
 		case "post":
 			//callPost();
@@ -74,9 +94,16 @@ public class Httpc {
 		
 		if(!args[1].equals("help")) {
 			
-			//getting URL i.e. the last element of the command line arguments
-			URL = args[args.length - 1];
-			
+			//check if output is to be stored into file
+			if(args[args.length - 2].equals("-o")) {
+				//getting URL i.e. the third last element of the command line arguments
+				URL = args[args.length - 3];
+				Constants.storeOutputToFile = true;
+			}
+			else {
+				//getting URL i.e. the last element of the command line arguments
+				URL = args[args.length - 1];
+			}
 			//split URL into host, path & query
 			parseURL(URL);
 		}

@@ -3,6 +3,7 @@ package utils;
 public class Constants {
 
 	public static final int DEFAULT_PORT = 80;
+	public static boolean storeOutputToFile = false;
 	public static final String HELP = "httpc is a curl-like application but supports HTTP protocol only.\n"
 			+ "Usage:\nhttpc command [arguments]\n"
 			+ "The commands are:\n"

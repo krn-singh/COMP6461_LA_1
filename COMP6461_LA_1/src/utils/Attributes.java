@@ -13,7 +13,7 @@ public class Attributes {
 	// Collection of request headers with key-value pair
 	private HashMap<String, String> headers;
 	// Inline data for HTTP POST Request with key-value pair
-	private HashMap<String, String> inlineData;
+	private String inlineData;
 	// File name for associating its content to the body HTTP POST Request
 	private String fileForHttpRequest;
 	// File name for storing the HTTP Response
@@ -70,13 +70,13 @@ public class Attributes {
 	/**
 	 * @return the inlineData
 	 */
-	public HashMap<String, String> getInlineData() {
+	public String getInlineData() {
 		return inlineData;
 	}
 	/**
 	 * @param inlineData the inlineData to set
 	 */
-	public void setInlineData(HashMap<String, String> inlineData) {
+	public void setInlineData(String inlineData) {
 		this.inlineData = inlineData;
 	}
 	/**

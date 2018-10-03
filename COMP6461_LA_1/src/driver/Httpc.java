@@ -15,7 +15,6 @@ public class Httpc {
 	private static String outputFileName;
 	private static String inputFileName;
 	private static HashMap<String, String> headers = null;
-	private static HashMap<String, String> inlineData = null;
 	public static Attributes atrObj;
 		
 	private static void parseURL(String URL) {
@@ -93,7 +92,8 @@ public class Httpc {
 					int numHeaders = 0;
 					int startIndex = 4;
 					if(args[args.length-3].equals("-d")) {
-						processInlineData(args[args.length-2]);
+						//processInlineData(args[args.length-2]);
+						atrObj.setInlineData(args[args.length-2]);
 						numHeaders = (args.length-6)/2;
 					}
 					else if(args[args.length-3].equals("-f")) {
@@ -113,7 +113,8 @@ public class Httpc {
 					int numHeaders = 0;
 					int startIndex = 3;
 					if(args[args.length-3].equals("-d")) {
-						processInlineData(args[args.length-2]);
+						//processInlineData(args[args.length-2]);
+						atrObj.setInlineData(args[args.length-2]);
 						numHeaders = (args.length-5)/2;
 					}
 					else if(args[args.length-3].equals("-f")) {
@@ -145,15 +146,6 @@ public class Httpc {
 			headers.put(keyValue[0], keyValue[1]);
 		}
 		atrObj.setHeaders(headers);
-	}
-	public static void processInlineData(String data) {
-		inlineData = new HashMap<>();
-		String parameters[] = data.split(",");
-		for(int i=0; i<parameters.length; i++) {
-			String keyValue[] = parameters[i].split(":");
-			inlineData.put(keyValue[0], keyValue[1]);
-		}
-		atrObj.setInlineData(inlineData);
 	}
 
 	public static void main(String[] args) throws IOException {

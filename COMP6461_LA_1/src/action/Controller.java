@@ -45,6 +45,7 @@ public class Controller {
 			// building a GET request
 			request += "GET " +attributes.getPath()+" HTTP/1.0\r\n";
 			request += "Host: "+attributes.getHost()+"\r\n";
+			// adding headers
 			if (attributes.getHeaders() != null) {
 				addHeaders(attributes.getHeaders());
 			}
@@ -68,7 +69,13 @@ public class Controller {
 				}
 				if (!isVerbose) {	response += line+"\n";	}				
 			}
+			
+			// print response in console 
 			System.out.println(response);
+			// save response in external file
+			if (attributes.getFileForHttpResponse() != null) {
+				saveResponse(attributes.getFileForHttpResponse(), response);
+			}
 		} finally {
 			request = null;
 			bufferReader.close();
@@ -101,6 +108,7 @@ public class Controller {
 			// building a GET request
 			request += "GET " +attributes.getPath()+" HTTP/1.0\r\n";
 			request += "Host: "+attributes.getHost()+"\r\n";
+			// adding headers
 			if (attributes.getHeaders() != null) {
 				addHeaders(attributes.getHeaders());
 			}
@@ -119,7 +127,13 @@ public class Controller {
 
 				response += line+"\n";
 			}
+			
+			// print response in console 
 			System.out.println(response);
+			// save response in external file
+			if (attributes.getFileForHttpResponse() != null) {
+				saveResponse(attributes.getFileForHttpResponse(), response);
+			}
 		} finally {
 			request = null;
 			bufferReader.close();
@@ -150,11 +164,21 @@ public class Controller {
 			// building a POST request
 			request += "POST " +attributes.getPath()+" HTTP/1.0\r\n";
 			request += "Host: "+attributes.getHost()+"\r\n";
+			// adding headers
 			if (attributes.getHeaders() != null) {
 				addHeaders(attributes.getHeaders());
 			}
+			// setting up the length of inline data
+			if (attributes.getInlineData() != null) {
+				request += "Content-Length:" + attributes.getInlineData().length() + "\r\n";
+			}			
+			request += "Connection: close\r\n";
 			request += "\r\n";
-			
+			// adding inline data
+			if (attributes.getInlineData() != null) {
+				request += attributes.getInlineData();
+			}
+
 			bufferWriter.write(request);
 			bufferWriter.flush();
 			
@@ -173,7 +197,13 @@ public class Controller {
 				}
 				if (!isVerbose) {	response += line+"\n";	}				
 			}
-			System.out.println(response);			
+			
+			// print response in console 
+			System.out.println(response);
+			// save response in external file
+			if (attributes.getFileForHttpResponse() != null) {
+				saveResponse(attributes.getFileForHttpResponse(), response);
+			}
 		} finally {
 			request = null;
 			bufferReader.close();
@@ -206,10 +236,20 @@ public class Controller {
 			// building a POST request
 			request += "POST " +attributes.getPath()+" HTTP/1.0\r\n";
 			request += "Host: "+attributes.getHost()+"\r\n";
+			// adding headers
 			if (attributes.getHeaders() != null) {
 				addHeaders(attributes.getHeaders());
 			}
+			// setting up the length of inline data
+			if (attributes.getInlineData() != null) {
+				request += "Content-Length:" + attributes.getInlineData().length() + "\r\n";
+			}			
+			request += "Connection: close\r\n";
 			request += "\r\n";
+			// adding inline data
+			if (attributes.getInlineData() != null) {
+				request += attributes.getInlineData();
+			}
 			
 			bufferWriter.write(request);
 			bufferWriter.flush();
@@ -224,7 +264,13 @@ public class Controller {
 
 				response += line+"\n";
 			}
-			System.out.println(response);			
+			
+			// print response in console 
+			System.out.println(response);
+			// save response in external file
+			if (attributes.getFileForHttpResponse() != null) {
+				saveResponse(attributes.getFileForHttpResponse(), response);
+			}
 		} finally {
 			request = null;
 			bufferReader.close();
@@ -241,23 +287,6 @@ public class Controller {
 	public void addHeaders(HashMap<String, String> headers) {
 		try {
 			headers.forEach((key,value) -> {
-				request += key+": "+value+"\r\n";
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Associate the body of the HTTP Request with the inline data[-d], 
-	 * meaning a set of characters for standard input. Similarly to -d, 
-	 * -f associate the body of the HTTP Request with the data from a given file.
-	 * 
-	 * @param data Collection of HTTP Request data with key-value pair
-	 */
-	public void data(HashMap<String, String> data) {
-		try {
-			data.forEach((key,value) -> {
 				request += key+": "+value+"\r\n";
 			});
 		} catch (Exception e) {

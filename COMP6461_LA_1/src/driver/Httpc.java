@@ -15,7 +15,6 @@ public class Httpc {
 	private static String outputFileName;
 	private static String inputFileName;
 	private static HashMap<String, String> headers = null;
-	private static HashMap<String, String> queryParms = null;
 	private static HashMap<String, String> inlineData = null;
 	public static Attributes atrObj;
 		

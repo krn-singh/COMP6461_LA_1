@@ -102,5 +102,5 @@ public class Attributes {
 	 */
 	public void setFileForHttpResponse(String fileForHttpResponse) {
 		this.fileForHttpResponse = fileForHttpResponse;
-	}	
+	}
 }

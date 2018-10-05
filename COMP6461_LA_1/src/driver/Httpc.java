@@ -12,6 +12,20 @@ import action.Controller;
 import utils.Constants;
 import utils.Attributes;;
 
+/**
+ * This main class performs the following tasks
+ * -	accept commands line arguments from users
+ * -	parse command line arguments to isolate
+ * 			- the type of html request
+ * 			- host
+ * 			- path
+ * 			- additional headers
+ * 			- input and output file names
+ * -	Then, it calls the respective html methods implemented in Controller class
+ * 
+ * @author mehak
+ *
+ */
 public class Httpc {
 	
 	private static String URL;

@@ -9,7 +9,7 @@ public class Attributes {
 	// HTTP Port Number
 	private int port;
 	// Directory at the host
-	private String path;
+	private String path = "/";
 	// Collection of request headers with key-value pair
 	private HashMap<String, String> headers;
 	// Inline data for HTTP POST Request with key-value pair

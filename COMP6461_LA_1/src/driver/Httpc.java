@@ -1,5 +1,8 @@
 package driver;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,13 +32,20 @@ public class Httpc {
 			str = str.substring(9, str.length()-1);
 		else if(str.startsWith("'http://"))
 			str = str.substring(8, str.length()-1);
+		else if(str.startsWith("\'"))
+			str = str.substring(1, str.length()-1);
 		
 		//checking first occurence of '/' in the string without http:// or https://
 		int index1 = str.indexOf('/');
 		
 		//splitting the string into host, path based on index of '/'
-		atrObj.setHost(str.substring(0, index1));
-		atrObj.setPath(str.substring(index1));
+		if(index1 != -1) {
+			atrObj.setHost(str.substring(0, index1));
+			atrObj.setPath(str.substring(index1));
+		}
+		else {
+			atrObj.setHost(URL);
+		}
 	}
 	
 	private static void parseCommand(String[] cmdArgs) throws IOException {
@@ -92,13 +102,20 @@ public class Httpc {
 					int numHeaders = 0;
 					int startIndex = 4;
 					if(args[args.length-3].equals("-d")) {
-						//processInlineData(args[args.length-2]);
 						atrObj.setInlineData(args[args.length-2]);
 						numHeaders = (args.length-6)/2;
 					}
 					else if(args[args.length-3].equals("-f")) {
 						inputFileName = args[args.length-2];
-						//******************read from file********************
+						File file = new File(inputFileName);
+						BufferedReader br = new BufferedReader(new FileReader(file)); 
+						String input = ""; 
+						String nextLine;
+						while ((nextLine = br.readLine()) != null) {
+						    input+=nextLine; 
+						 } 
+						atrObj.setInlineData(input);
+						br.close();
 						numHeaders = (args.length-6)/2;
 					}
 					else if (args[args.length-3].equals("-h")) {
@@ -113,13 +130,20 @@ public class Httpc {
 					int numHeaders = 0;
 					int startIndex = 3;
 					if(args[args.length-3].equals("-d")) {
-						//processInlineData(args[args.length-2]);
 						atrObj.setInlineData(args[args.length-2]);
 						numHeaders = (args.length-5)/2;
 					}
 					else if(args[args.length-3].equals("-f")) {
 						inputFileName = args[args.length-2];
-						//******************read from file********************
+						File file = new File(inputFileName); 
+					    BufferedReader br = new BufferedReader(new FileReader(file));   
+						String input = ""; 
+						String nextLine;
+						while ((nextLine = br.readLine()) != null) {
+						    input+=nextLine; 
+						} 
+						atrObj.setInlineData(input);
+						br.close();
 						numHeaders = (args.length-5)/2;
 					}
 					else if (args[args.length-3].equals("-h")) {

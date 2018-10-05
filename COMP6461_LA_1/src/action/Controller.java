@@ -22,6 +22,8 @@ public class Controller {
 
 	// Stores the request
 	private String request = null;
+	private boolean fileOpen = false;
+	private BufferedWriter write;
 	
 	/**
 	 * Simple GET request to fetch data from host.
@@ -69,12 +71,24 @@ public class Controller {
 				}
 				if (!isVerbose) {	response += line+"\n";	}				
 			}
-			
+			if(response.isEmpty() || (!response.substring(9, 12).equals("302") && !response.substring(9, 12).equals("301"))) {
 			// print response in console 
 			System.out.println(response);
 			// save response in external file
 			if (attributes.getFileForHttpResponse() != null) {
 				saveResponse(attributes.getFileForHttpResponse(), response);
+				write.close();
+			}
+			}
+			else {
+				//redirecting
+				redirect(attributes, response);
+				if (attributes.getFileForHttpResponse() != null) {
+					saveResponse(attributes.getFileForHttpResponse(), response);
+					write.write("\nRedirecting to... http://" + attributes.getHost() + attributes.getPath() + "\n\n");
+				}
+				getRequest(attributes);
+				write.close();
 			}
 		} finally {
 			request = null;
@@ -127,12 +141,25 @@ public class Controller {
 
 				response += line+"\n";
 			}
-			
+
+			if(response.isEmpty() || (!response.substring(9, 12).equals("302") && !response.substring(9, 12).equals("301"))) {
 			// print response in console 
 			System.out.println(response);
 			// save response in external file
 			if (attributes.getFileForHttpResponse() != null) {
 				saveResponse(attributes.getFileForHttpResponse(), response);
+				write.close();
+			}
+			}
+			else {
+				//redirecting
+				redirect(attributes, response);
+				if (attributes.getFileForHttpResponse() != null) {
+					saveResponse(attributes.getFileForHttpResponse(), response);
+					write.write("\nRedirecting to... http://" + attributes.getHost() + attributes.getPath() + "\n\n");
+				}
+				getRequestWithVerbose(attributes);
+				write.close();
 			}
 		} finally {
 			request = null;
@@ -142,6 +169,40 @@ public class Controller {
 		}
 	}
 	
+	private void redirect(Attributes attributes, String response) {
+		System.out.println(response);
+		System.out.println("\nRedirecting to... http://" + attributes.getHost() + attributes.getPath() + "\n\n");
+		int index1 = response.indexOf("Location");
+		int index2 = response.indexOf("\n", index1);
+		String newURL = response.substring(index1+10, index2);
+		
+		//check if URL starts with http:// or http://
+		if(newURL.startsWith("http://"))
+			newURL = newURL.substring(7);
+		else if(newURL.startsWith("https://"))
+			newURL = newURL.substring(8);
+		else if(newURL.startsWith("'https://"))
+			newURL = newURL.substring(9, newURL.length()-1);
+		else if(newURL.startsWith("'http://"))
+			newURL = newURL.substring(8, newURL.length()-1);
+		
+		//checking first occurence of '/' in the string without http:// or https://
+		int index3 = newURL.indexOf('/');
+		if(index3==-1)
+			index3 = newURL.indexOf(".com")+4;
+		
+		//splitting the string into host, path based on index of '/'
+		if(index3 != -1) {
+		attributes.setHost(newURL.substring(0, index3));
+		attributes.setPath(newURL.substring(index3));
+		}
+		else {
+			attributes.setHost(newURL);
+			attributes.setPath("/");
+		}
+
+	}
+
 	/**
 	 * Simple POST request to fetch additional data from host.
 	 * 
@@ -203,6 +264,7 @@ public class Controller {
 			// save response in external file
 			if (attributes.getFileForHttpResponse() != null) {
 				saveResponse(attributes.getFileForHttpResponse(), response);
+				write.close();
 			}
 		} finally {
 			request = null;
@@ -270,6 +332,7 @@ public class Controller {
 			// save response in external file
 			if (attributes.getFileForHttpResponse() != null) {
 				saveResponse(attributes.getFileForHttpResponse(), response);
+				write.close();
 			}
 		} finally {
 			request = null;
@@ -302,13 +365,14 @@ public class Controller {
 	 * @throws IOException
 	 */
 	public void saveResponse(String fileForHttpResponse, String response) throws IOException {
-		BufferedWriter write = new BufferedWriter(new FileWriter(new File(fileForHttpResponse)));
+		if(!fileOpen) {
+			write = new BufferedWriter(new FileWriter(new File(fileForHttpResponse)));
+			fileOpen = true;
+		}
 		try {
 			write.write(response);
 		} catch (Exception e) {	
 			e.printStackTrace();
-		} finally {	
-			write.close();
-		}
+		} 
 	}
 }
